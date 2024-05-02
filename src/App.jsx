@@ -1,14 +1,14 @@
 import './index.css';
-import Chat from './components/chat/chat';
-import Detail from './components/details/details';
+import Chat from './components/details/details';
 import List from './components/list/list';
+import Chats from './components/chats/chats';
 
 
 function App() {
   return (
     <div className='container'>
       <List/>
-      <Detail/> 
+      <Chats/> 
       <Chat/>   
     </div>
   );

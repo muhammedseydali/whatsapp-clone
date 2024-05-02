@@ -1,10 +1,11 @@
 import "./details.css";
 
 
-const Detail = () => {
+const Details = () => {
     return (
-        <div className="detail">Detail</div>
+        <div className="chat">details
+        </div>
     )
 }
 
-export default Detail
+export default Details
