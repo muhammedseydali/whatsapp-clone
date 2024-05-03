@@ -1,7 +1,7 @@
 import './index.css';
-import Chat from './components/details/details';
-import List from './components/list/list';
 import Chats from './components/chats/chats';
+import List from './components/list/list';
+import Details from './components/details/details';
 
 
 function App() {
@@ -9,7 +9,7 @@ function App() {
     <div className='container'>
       <List/>
       <Chats/> 
-      <Chat/>   
+      <Details/>
     </div>
   );
 }

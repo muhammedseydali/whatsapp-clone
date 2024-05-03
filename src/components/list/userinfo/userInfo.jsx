@@ -4,7 +4,6 @@ const UserInfo = () => {
     return (
         <div className="">
             <div className="user">
-                <img src="./avata.png" alt=""/>
                 <h2>Jhon Doe</h2>
             </div>
 
