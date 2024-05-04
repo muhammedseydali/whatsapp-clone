@@ -1,11 +1,17 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./chats.css";
 import EmojiPicker from "emoji-picker-react"
+import { useRef } from "react";
 
 const Chats = () => {
 const[open,SetOpen] = useState(false);
 const[text, SetText] = useState("");
 
+const endRef = useRef(null)
+
+useEffect(() => {
+    endRef.current?.scrollIntoView({behavior:"smooth"})
+})
 
 const HandleEmoji = e =>{
     SetText((prev) => prev + e.emoji);
@@ -30,16 +36,46 @@ console.log(text)
                     <img src="./mic.png" alt=""/>
                 </div>
             </div>
-            <div className="center"></div>
+            <div className="center">
+                <div className="message">
+                    <img src="./avatar.png" alt=""/>
+                    <div className="texts">
+                        <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Porro iure nam fugiat dicta facilis?</p>
+                        <span>1 min ago</span>
+                    </div>
+                </div>
+                <div className="message own">
+                    <img src="./avatar.png" alt=""/>
+                    <div className="texts">
+                        <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Porro iure nam fugiat dicta facilis?</p>
+                        <span>1 min ago</span>
+                    </div>
+                </div>
+                <div className="message">
+                    <img src="./avatar.png" alt=""/>
+                    <div className="texts">
+                        <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Porro iure nam fugiat dicta facilis?</p>
+                        <span>1 min ago</span>
+                    </div>
+                </div>
+                <div className="message own">
+                    <img src="./avatar.png" alt=""/>
+                    <div className="texts">
+                        <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Porro iure nam fugiat dicta facilis?</p>
+                        <span>1 min ago</span>
+                    </div>
+                </div>
+                <div ref={endRef}></div>
+            </div>
             <div className="bottom">
                 <div className="icons">
-                    <img src="" alt=""/>
-                    <img src="" alt=""/>
-                    <img src="" alt=""/>
+                    <img src="./gallery.png" alt=""/>
+                    <img src="./chat-camera.png" alt=""/>
+                    <img src="./chat-mic.png" alt=""/>
                 </div>
                 <input type="text" placeholder="type a message" value={text} onChange={(e) => SetText(e.target.value)}/>
                 <div className="emoji">
-                    <img src="" alt="" onClick={() => SetOpen((prev) => !prev)}/>
+                    <img src="./emoji.png" alt="" onClick={() => SetOpen((prev) => !prev)}/>
                     <div className="picker">
                     <EmojiPicker open={open} onEmojiClick={HandleEmoji}/>
                     </div>
