@@ -8,7 +8,7 @@ const UserInfo = () => {
             </div>
 
             <div className="icons">
-                <img src="./more.png" alt="" />
+                <img src="./images/avatr.png" alt="" />
                 <img src="" alt="" />
                 <img src="./edit.png" alt="" />
             </div>
