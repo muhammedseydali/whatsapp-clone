@@ -3,15 +3,38 @@ import './chatList.css';
 import AddUser from '../../addUser/addUser';
 import { userStore } from '../../../lib/userStore';
 import { onSnapshot } from 'firebase/firestore';
-
-
-
+import {auth, db} from "../../lib/firebase";
+import {doc, setDoc, getDoc} from "firebase/firestore";
+import {useChatStore} from "../../lib/useChatStore"
 
 const ChatList = () => {
 
     const [addMode, setaddMode] = useState(false);
     const [chats, setChats] = useState([]);
     const {currentUser} = userStore();
+    const {changeChat} = useChatStore();
+
+
+    useEffect(()=>{
+        const unSub = onSnapshot(
+            doc(db, "userchats", currentUser.id),
+            async (res) =>{
+                const items = res.data().chats;
+
+                const promises = items.map(async(item) =>{
+                    const userDocRef = doc(db, "users", items.recieverId);
+                    const userDocsnap = await getDoc(userDocRef);
+
+                    const user = userDocsnap.data();
+
+                    return { ...item, user};
+                });
+                const chatData = await Promise.all(promises)
+
+                setChats(chatData.sort((a,b) => b.updatedAt - a.updatedAt));
+            }
+        )
+    })
 
     useEffect(()=>{
         const unSub = onSnapshot(doc(db, "userchats", currentUser.id), (doc)=> {
@@ -24,6 +47,10 @@ const ChatList = () => {
         
     }, [currentUser.id])
     console.log(chats)
+
+    const handleSelect = (chat)=>{
+        changeChat(chat.chatId, chat.user)
+    }
 
     return (
         <div className="chatList">
@@ -43,60 +70,20 @@ const ChatList = () => {
                     <p>messages</p>
                 </div>
             </div>
+            {chats.map((chat) =>(
+
+            
             <div className="item">
-                <img src='./avatar.png' alt=''/>
+                <img src={chat.user.avatar || './avatar.png'} alt='' key={chat.chatId} onClick={()=> handleSelect(chat)}/>
                 <div className="texts">
                     <span>
-                        Jhon doe
+                        {chat.user.username }
                     </span>
-                    <p>messages</p>
+                    <p>{chat.lastMessage}</p>
                 </div>
             </div>
-            <div className="item">
-                <img src='./avatar.png' alt=''/>
-                <div className="texts">
-                    <span>
-                        Jhon doe
-                    </span>
-                    <p>messages</p>
-                </div>
-            </div>
-            <div className="item">
-                <img src='./avatar.png' alt=''/>
-                <div className="texts">
-                    <span>
-                        Jhon doe
-                    </span>
-                    <p>messages</p>
-                </div>
-            </div>
-            <div className="item">
-            <img src='./avatar.png' alt=''/>
-                <div className="texts">
-                    <span>
-                        Jhon doe
-                    </span>
-                    <p>messages</p>
-                </div>
-            </div>
-            <div className="item">
-                <img src='./avatar.png' alt=''/>
-                <div className="texts">
-                    <span>
-                        Jhon doe
-                    </span>
-                    <p>messages</p>
-                </div>
-            </div>
-            <div className="item">
-                <img src='./avatar.png' alt=''/>
-                <div className="texts">
-                    <span>
-                        Jhon doe
-                    </span>
-                    <p>messages</p>
-                </div>
-            </div>
+            ))}
+
             {addMode && <AddUser />}
         </div>
     )
