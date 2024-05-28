@@ -1,83 +1,66 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import "./chats.css";
-import EmojiPicker from "emoji-picker-react"
-import { useRef } from "react";
-import { onSnapshot } from "firebase/firestore";
-import {doc, onSnapshot} from "firebase/firestore"
-import {db} from "../../lib/firebase",
-import {useChatStore} from "../../lib/useChatStore"
-
+import EmojiPicker from "emoji-picker-react";
+import { onSnapshot, doc } from "firebase/firestore";
+import { db } from "../../lib/firebase";
+import { useChatStore } from "../../lib/useChatStore";
 
 const Chats = () => {
-const[open,SetOpen] = useState(false);
-const[text, SetText] = useState("");
-const [chats, setChats] = useState();
+    const [open, setOpen] = useState(false);
+    const [text, setText] = useState("");
+    const [chats, setChats] = useState();
+    const { chatId } = useChatStore();
+    const endRef = useRef(null);
 
-const {chatId} = useChatStore();
+    useEffect(() => {
+        endRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, []);
 
-const endRef = useRef(null)
+    useEffect(() => {
+        const unSub = onSnapshot(doc(db, "chats", chatId), (res) => {
+            setChats(res.data());
+        });
 
-useEffect(() => {
-    endRef.current?.scrollIntoView({behavior:"smooth"})
-}, [])
+        return () => {
+            unSub();
+        };
+    }, [chatId]);
 
-useEffect(() =>{
-    const unSub = onSnapshot(doc(db, "chats", chatId), (res)=>{
-        setChats(res.data())
-    })
-
-    return () =>{
-        unSub();
+    const handleEmoji = (e) => {
+        setText((prev) => prev + e.emoji);
+        setOpen(false);
     };
-}, [chatId])
 
-const HandleEmoji = e =>{
-    SetText((prev) => prev + e.emoji);
-    SetOpen(false)
-};
-
-console.log(text)
+    console.log(text);
 
     return (
-        <div className="chat">Chat
+        <div className="chat">
             <div className="top">
                 <div className="user">
-                    <img src="./avatar.png" alt=""/>
+                    <img src="./avatar.png" alt="" />
                     <div className="texts">
-                        <span>jane doe</span>
-                        <p>lorem ipsum doller</p>
+                        <span>Jane Doe</span>
+                        <p>Lorem ipsum dolor</p>
                     </div>
                 </div>
                 <div className="icons">
-                    <img src="./phone.png" alt=""/>
-                    <img src="./video.png" alt=""/>
-                    <img src="./mic.png" alt=""/>
+                    <img src="./phone.png" alt="" />
+                    <img src="./video.png" alt="" />
+                    <img src="./mic.png" alt="" />
                 </div>
             </div>
             <div className="center">
-                <div className="message">
-                    <img src="./avatar.png" alt=""/>
-                    <div className="texts">
-                        <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Porro iure nam fugiat dicta facilis?</p>
-                        <span>1 min ago</span>
+                {chats?.messages?.map((message) => (
+                    <div className="message" key={message?.createdAt}>
+                        {message.image && <img src={message.img} alt="" />}
+                        <div className="texts">
+                            <p>{message.text}</p>
+                            <span>1 min ago</span>
+                        </div>
                     </div>
-                </div>
+                ))}
                 <div className="message own">
-                    <img src="./avatar.png" alt=""/>
-                    <div className="texts">
-                        <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Porro iure nam fugiat dicta facilis?</p>
-                        <span>1 min ago</span>
-                    </div>
-                </div>
-                <div className="message">
-                    <img src="./avatar.png" alt=""/>
-                    <div className="texts">
-                        <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Porro iure nam fugiat dicta facilis?</p>
-                        <span>1 min ago</span>
-                    </div>
-                </div>
-                <div className="message own">
-                    <img src="./avatar.png" alt=""/>
+                    <img src="./avatar.png" alt="" />
                     <div className="texts">
                         <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Porro iure nam fugiat dicta facilis?</p>
                         <span>1 min ago</span>
@@ -87,21 +70,23 @@ console.log(text)
             </div>
             <div className="bottom">
                 <div className="icons">
-                    <img src="./gallery.png" alt=""/>
-                    <img src="./chat-camera.png" alt=""/>
-                    <img src="./chat-mic.png" alt=""/>
+                    <img src="./gallery.png" alt="" />
+                    <img src="./chat-camera.png" alt="" />
+                    <img src="./chat-mic.png" alt="" />
                 </div>
-                <input type="text" placeholder="type a message" value={text} onChange={(e) => SetText(e.target.value)}/>
+                <input type="text" placeholder="Type a message" value={text} onChange={(e) => setText(e.target.value)} />
                 <div className="emoji">
-                    <img src="./emoji.png" alt="" onClick={() => SetOpen((prev) => !prev)}/>
-                    <div className="picker">
-                    <EmojiPicker open={open} onEmojiClick={HandleEmoji}/>
-                    </div>
+                    <img src="./emoji.png" alt="" onClick={() => setOpen((prev) => !prev)} />
+                    {open && (
+                        <div className="picker">
+                            <EmojiPicker onEmojiClick={handleEmoji} />
+                        </div>
+                    )}
                 </div>
                 <button className="sendbutton">Send</button>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default Chats
+export default Chats;
