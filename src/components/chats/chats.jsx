@@ -56,9 +56,9 @@ const Chats = () => {
                     
                     const ChatIndex = userChatsData.chats.findIndex(c => c.ChatId === chatId)
                     
-                    userChatsData[ChatIndex].lastMessage = text;
-                    userChatsData[ChatIndex].isSeen = id === currentUser.id ? true: false;
-                    userChatsData[ChatIndex].Date.now();
+                    userChatsData.chats[ChatIndex].lastMessage = text;
+                    userChatsData.chats[ChatIndex].isSeen = id === currentUser.id ? true: false;
+                    userChatsData.chats[ChatIndex].Date.now();
                     
                     await updateDoc(userChatsRef,{
                         chats:userChatsData.chats,
