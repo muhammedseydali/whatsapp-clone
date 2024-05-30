@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import "./chats.css";
 import EmojiPicker from "emoji-picker-react";
-import { onSnapshot, doc } from "firebase/firestore";
+import { onSnapshot, doc, arrayUnion, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../lib/firebase";
 import { useChatStore } from "../../lib/useChatStore";
 
@@ -11,6 +11,7 @@ const Chats = () => {
     const [chats, setChats] = useState();
     const { chatId } = useChatStore();
     const endRef = useRef(null);
+    const currentUser = useUserStore()
 
     useEffect(() => {
         endRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -30,6 +31,48 @@ const Chats = () => {
         setText((prev) => prev + e.emoji);
         setOpen(false);
     };
+
+    const handleSend = async () => {
+        if (text === "") return;
+    
+        try {
+            await updateDoc(doc(db, "chats", chatId), {
+                messages: arrayUnion({
+                    senderId:currentUser.id,
+                    text,
+                    createdAt:new Date(),
+                })
+            });
+
+            const userIds = [currentUser.id, user.id];
+            userIds.forEach(async(id) =>{
+
+                
+                const userChatsRef = doc(db, "userchats", id)
+                const userChatsSnapshot = await getDoc(userChatsRef)
+                
+                if(userChatsSnapshot.exists()){
+                    const userChatsData = userChatsSnapshot.data()
+                    
+                    const ChatIndex = userChatsData.chats.findIndex(c => c.ChatId === chatId)
+                    
+                    userChatsData[ChatIndex].lastMessage = text;
+                    userChatsData[ChatIndex].isSeen = id === currentUser.id ? true: false;
+                    userChatsData[ChatIndex].Date.now();
+                    
+                    await updateDoc(userChatsRef,{
+                        chats:userChatsData.chats,
+                    });
+                })
+
+
+            }
+
+        } catch (err) {
+            console.log(err);
+        }
+    };
+    
 
     console.log(text);
 
@@ -83,7 +126,7 @@ const Chats = () => {
                         </div>
                     )}
                 </div>
-                <button className="sendbutton">Send</button>
+                <button className="sendbutton" onClick={handleSend}>Send</button>
             </div>
         </div>
     );
