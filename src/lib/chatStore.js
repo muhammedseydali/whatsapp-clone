@@ -1,43 +1,45 @@
-import { getDoc } from 'firebase/firestore';
-import { create } from 'zustand'
+import { create } from 'zustand';
+import { useUserStore } from '../lib/userStore';
+import { db } from './firebase'; // Ensure you import your Firebase instance
 
 export const chatStore = create((set) => ({
   chatId: null,
-  user:null,
-  isCurrentUserBlocked:false,
-  isRecieverBlocked:false,
+  user: null,
+  isCurrentUserBlocked: false,
+  isRecieverBlocked: false,
   isLoading: true,
-  changeChat: (chatId, user) =>{
-    const currentUser = useUserStore.getState().currentUser
 
-    //CHECK IF USER IS BLOCKED
+  changeChat: (chatId, user) => {
+    const currentUser = useUserStore.getState().currentUser;
 
-    if(user.blocked.includes(currentUser.id)){
-        return set({
-            chatId,
-            user:null,
-            isCurrentUserBlocked:true,
-            isRecieverBlocked:false
-        });
+    // CHECK IF USER IS BLOCKED
+    if (user.blocked.includes(currentUser.id)) {
+      return set({
+        chatId,
+        user: null,
+        isCurrentUserBlocked: true,
+        isRecieverBlocked: false,
+      });
     }
 
-
-    //CHECK IF RECIEVER IS BLOCKED
-
-   else if(currentUser.blocked.includes(user.id)){
-        return set({
-            chatId,
-            user:user,
-            isCurrentUserBlocked:false,
-            isRecieverBlocked:true
-        });
-    } else
-         return set({
-            chatId,
-            user:user,
-            isCurrentUserBlocked:false,
-            isRecieverBlocked:true
-        });
+    // CHECK IF RECEIVER IS BLOCKED
+    if (currentUser.blocked.includes(user.id)) {
+      return set({
+        chatId,
+        user: user,
+        isCurrentUserBlocked: false,
+        isRecieverBlocked: true,
+      });
+    } else {
+      return set({
+        chatId,
+        user: user,
+        isCurrentUserBlocked: false,
+        isRecieverBlocked: false,
+      });
     }
-
+  },
 }));
+
+export default chatStore;
+export { chatStore as useChatStore };
