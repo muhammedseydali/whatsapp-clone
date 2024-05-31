@@ -1,27 +1,31 @@
-import { getDoc } from 'firebase/firestore';
-import { create } from 'zustand'
+import { getDoc, doc } from 'firebase/firestore';
+import { create } from 'zustand';
+import { db } from './firebase'; // Ensure you import your Firebase instance
 
+// Define the user store using Zustand
 export const userStore = create((set) => ({
   currentUser: null,
   isLoading: true,
-  fetchuserInfo : async (uid) => {
-    if(!uid) return set({ currentUser: null, isLoading: false});
 
-    try{
+  // Define the fetchUserInfo function to fetch user information
+  fetchUserInfo: async (uid) => {
+    if (!uid) return set({ currentUser: null, isLoading: false });
 
-        const docRef = doc(db , "users" , uid);
-        const docSnap = await getDoc(docRef);
+    try {
+      const docRef = doc(db, "users", uid);
+      const docSnap = await getDoc(docRef);
 
-        if (docSnap.exists()) {
-            set({currentuser: docSnap.data(), isLoading:false});
-        } else{
-            set({currentUser:null, isLoading:false});
-        }
-
-    }catch(err){
-        console.log(err)
-        return set({ currentUser:null , isLoading:false})
+      if (docSnap.exists()) {
+        set({ currentUser: docSnap.data(), isLoading: false });
+      } else {
+        set({ currentUser: null, isLoading: false });
+      }
+    } catch (err) {
+      console.log(err);
+      return set({ currentUser: null, isLoading: false });
     }
-  } 
-}))
-export default user;
+  }
+}));
+
+export default userStore;
+export { userStore as useUserStore };

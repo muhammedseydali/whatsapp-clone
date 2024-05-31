@@ -1,8 +1,8 @@
 import {doc, collection, getDoc, query, serverTimestamp, setDoc, where, updateDoc, arrayUnion } from "firebase/firestore";
 import "./addUser.css"
-import {db} from "../../../../lib/firebase"
+import {db} from "../../lib/firebase"
 import { useState } from "react";
-import {useUserStore} from "../../../../lib/userStore";
+import {useUserStore} from "../../lib/userStore"
 
 
 const   AddUser = () => {
